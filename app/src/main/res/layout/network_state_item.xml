@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp">
-    <TextView
-        android:id="@+id/error_msg_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Error Message"/>
-    <ProgressBar
-        android:id="@+id/progress_bar_item"
-        style="?android:attr/progressBarStyle"
+    android:layout_height="@dimen/recycler_loading_view_height">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"/>
+        android:orientation="vertical"
+        android:padding="8dp">
 
-    <com.example.foodrecipes.HorizontalDottedProgress
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        <TextView
+            android:id="@+id/error_msg_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Error Message" />
 
-</LinearLayout>
+        <ProgressBar
+            android:id="@+id/progress_bar_item"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+        <com.example.foodrecipes.HorizontalDottedProgress
+            android:id="@+id/dotted_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+    </LinearLayout>
+</RelativeLayout>

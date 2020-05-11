@@ -24,6 +24,10 @@ class RecipeListViewModel(private val recipeListRepostory: RecipePagedListReposi
         recipeListRepostory.fetchLiveNetworkState()
     }
 
+    val networkStateForSearch : LiveData<NetworkState> by lazy {
+        recipeListRepostory.fetchLiveNetworkStateForSearch()
+    }
+
     fun listIsEmpty() : Boolean{
         return recipePagedList.value?.isEmpty() ?: true
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.*
@@ -14,8 +15,10 @@ import com.example.foodrecipes.Repository.NetworkState
 import com.example.foodrecipes.api.IFoodRecipesAPI
 import com.example.foodrecipes.api.ServiceGenerator
 import kotlinx.android.synthetic.main.activity_recipe_list.*
+import kotlinx.android.synthetic.main.layout_recipe_list_item.*
+import kotlinx.android.synthetic.main.network_state_item.*
 
-class RecipeListActivity : AppCompatActivity() {
+class RecipeListActivity : BaseActivity() {
 
     private lateinit var viewModel: RecipeListViewModel
 
@@ -25,11 +28,11 @@ class RecipeListActivity : AppCompatActivity() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
 
-    private lateinit var recipeAdapter : RecipeSearchPagedListAdapter
+    private lateinit var recipeAdapter: RecipeSearchPagedListAdapter
 
-    private lateinit var context : LifecycleOwner
+    private lateinit var context: LifecycleOwner
 
-    private lateinit var apiService : IFoodRecipesAPI
+    private lateinit var apiService: IFoodRecipesAPI
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,16 +57,17 @@ class RecipeListActivity : AppCompatActivity() {
         })
 
         viewModel.networkState.observe(this, Observer {
-            progress_bar_popular.visibility = if (viewModel.listIsEmpty() && it == NetworkState.LOADING) View.VISIBLE else View.GONE
-            txt_error_popular.visibility = if (viewModel.listIsEmpty() && it == NetworkState.ERROR) View.VISIBLE else View.GONE
-
+            progress_bar_popular.visibility =
+                if (viewModel.listIsEmpty() && it == NetworkState.LOADING) View.VISIBLE else View.GONE
+            //txt_error_popular.visibility = if (viewModel.listIsEmpty() && it == NetworkState.ERROR) View.VISIBLE else View.GONE
+            showProgressBar(if (it == NetworkState.ERROR) true else false)
+            showErrorMessage(if (it == NetworkState.ERROR) true else false, null)
             if (!viewModel.listIsEmpty()) {
                 recipeAdapter.setNetworkState(it)
             }
         })
         println("TESTING APP")
         initSearchView()
-
 
     }
 
@@ -76,7 +80,7 @@ class RecipeListActivity : AppCompatActivity() {
         })[RecipeListViewModel::class.java]
     }
 
-    private fun getViewModel(query : String): RecipeListViewModel {
+    private fun getViewModel(query: String): RecipeListViewModel {
         return ViewModelProviders.of(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
@@ -92,18 +96,33 @@ class RecipeListActivity : AppCompatActivity() {
 
     }
 
-    fun initSearchView(){
+    fun initSearchView() {
         search_view.setOnQueryTextListener(object :
             androidx.appcompat.widget.SearchView.OnQueryTextListener {
 
             override fun onQueryTextSubmit(query: String?): Boolean {
                 recipeRepository = RecipePagedListRepository(apiService, query!!)
-                searchViewModel =  RecipeListViewModel(recipeRepository, "")
+                searchViewModel = RecipeListViewModel(recipeRepository, "")
                 searchViewModel.searchPagedList.observe(context, Observer {
                     recipeAdapter.clear()
                     recipeAdapter.submitList(it)
                 })
-                Log.i("RecipeListActivity","Llego al querytextchange")
+                Log.i("RecipeListActivity", "Llego al querytextchange")
+
+                searchViewModel.networkStateForSearch.observe(context, Observer {
+                    progress_bar_popular.visibility =
+                        if (searchViewModel.listIsEmpty() && it == NetworkState.LOADING) View.VISIBLE else View.GONE
+                    //txt_error_popular.visibility = if (searchViewModel.listIsEmpty() && it == NetworkState.ERROR) View.VISIBLE else View.GONE
+
+
+                    showProgressBar(if (it == NetworkState.ERROR) true else false)
+                    showErrorMessage(if (it == NetworkState.ERROR) true else false, null)
+
+                    if (!searchViewModel.listIsEmpty()) {
+                        recipeAdapter.setNetworkState(it)
+                    }
+                })
+
                 return false
             }
 
@@ -112,5 +131,7 @@ class RecipeListActivity : AppCompatActivity() {
             }
 
         })
+
+
     }
 }

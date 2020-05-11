@@ -52,5 +52,10 @@ class RecipePagedListRepository(private val getRecipeApi: IFoodRecipesAPI, priva
             recipeSearchDataSourceFactory.recipeListLiveDataSource, RecipeSearchDataSource::networkState)
     }
 
+    fun fetchLiveNetworkStateForSearch() : LiveData<NetworkState>{
+        return Transformations.switchMap<RecipeSearchDataSource, NetworkState>(
+            recipeSearchDataSourceFactoryNew.recipeListLiveDataSource, RecipeSearchDataSource::networkState)
+    }
+
 
 }

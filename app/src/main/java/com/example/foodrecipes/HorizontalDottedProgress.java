@@ -11,6 +11,8 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.Transformation;
 
+import androidx.annotation.NonNull;
+
 public class HorizontalDottedProgress extends View {
 
     //actual dot radius
@@ -113,7 +115,7 @@ public class HorizontalDottedProgress extends View {
                 if (mDotPosition == mDotAmount) {
                     mDotPosition = 0;
                 }
-                Log.d("INFOMETHOD","----On Animation Repeat----");
+                //Log.d("INFOMETHOD","----On Animation Repeat----");
 
             }
         });
@@ -128,5 +130,10 @@ public class HorizontalDottedProgress extends View {
             //call invalidate to redraw your view againg.
             invalidate();
         }
+    }
+
+    @Override
+    protected void onVisibilityChanged(@NonNull View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
     }
 }

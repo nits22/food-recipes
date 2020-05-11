@@ -68,6 +68,7 @@ class RecipeSearchDataSource(
             )
         } catch (e: Exception) {
             Log.e("RecipeSearchDataSource", e.message)
+            networkState.postValue(NetworkState.ERROR)
         }
     }
 

@@ -14,8 +14,11 @@ import com.example.foodrecipes.R
 import com.example.foodrecipes.Repository.NetworkState
 import com.example.foodrecipes.ui.recipeDetails.RecipeActivity
 import com.example.foodrecipes.vo.Recipe
+import kotlinx.android.synthetic.main.activity_recipe_list.view.*
 import kotlinx.android.synthetic.main.layout_recipe_list_item.view.*
+import kotlinx.android.synthetic.main.network_state_item.*
 import kotlinx.android.synthetic.main.network_state_item.view.*
+
 
 class RecipeSearchPagedListAdapter(private val context: Context) :
     PagedListAdapter<Recipe, RecyclerView.ViewHolder>(RecipeDiffCallBack()) {
@@ -24,10 +27,11 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
     val NETWORK_VIEW_TYPE = 2
 
     private var networkState: NetworkState? = null
+    private lateinit var view: View
+    private lateinit var layoutInflater : LayoutInflater
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val view: View
+        layoutInflater = LayoutInflater.from(parent.context)
 
         if (viewType == RECIPE_VIEW_TYPE) {
             view = layoutInflater.inflate(R.layout.layout_recipe_list_item, parent, false)
@@ -152,6 +156,19 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
         val size = super.getItemCount()
         notifyDataSetChanged()
         notifyItemRangeRemoved(0, size)
+    }
+
+//    var parent = findViewById(android.R.id.content) as ViewGroup
+    fun setErrorNetworkState(networkState: NetworkState?, parent: ViewGroup){
+        if(networkState == NetworkState.ERROR){
+
+            layoutInflater = LayoutInflater.from(parent.context)
+            view = layoutInflater.inflate(R.layout.network_state_item, null)
+            view.dotted_progress.visibility = View.VISIBLE
+            var obj  = NetworkStateItemViewHolder(view)
+            setNetworkState(networkState)
+            obj.bind(networkState)
+        }
     }
 
 }
