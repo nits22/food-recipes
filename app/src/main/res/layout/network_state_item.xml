@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
 
-        <com.example.foodrecipes.HorizontalDottedProgress
+        <com.example.foodrecipes.util.HorizontalDottedProgress
             android:id="@+id/dotted_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

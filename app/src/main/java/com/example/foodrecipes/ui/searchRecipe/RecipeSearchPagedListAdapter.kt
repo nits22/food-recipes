@@ -14,9 +14,8 @@ import com.example.foodrecipes.R
 import com.example.foodrecipes.Repository.NetworkState
 import com.example.foodrecipes.ui.recipeDetails.RecipeActivity
 import com.example.foodrecipes.vo.Recipe
-import kotlinx.android.synthetic.main.activity_recipe_list.view.*
+import kotlinx.android.synthetic.main.layout_category_list_item.view.*
 import kotlinx.android.synthetic.main.layout_recipe_list_item.view.*
-import kotlinx.android.synthetic.main.network_state_item.*
 import kotlinx.android.synthetic.main.network_state_item.view.*
 
 
@@ -25,20 +24,32 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
 
     val RECIPE_VIEW_TYPE = 1
     val NETWORK_VIEW_TYPE = 2
+    val CATEGORY_VIEW_TYPE = 3
 
     private var networkState: NetworkState? = null
     private lateinit var view: View
-    private lateinit var layoutInflater : LayoutInflater
+    private lateinit var layoutInflater: LayoutInflater
+    private var category: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         layoutInflater = LayoutInflater.from(parent.context)
 
-        if (viewType == RECIPE_VIEW_TYPE) {
-            view = layoutInflater.inflate(R.layout.layout_recipe_list_item, parent, false)
-            return RecipeItemViewHolder(view)
-        } else {
-            view = layoutInflater.inflate(R.layout.network_state_item, parent, false)
-            return NetworkStateItemViewHolder(view)
+        when (viewType) {
+
+            RECIPE_VIEW_TYPE -> {
+                view = layoutInflater.inflate(R.layout.layout_recipe_list_item, parent, false)
+                return RecipeItemViewHolder(view)
+            }
+            NETWORK_VIEW_TYPE -> {
+                view = layoutInflater.inflate(R.layout.network_state_item, parent, false)
+                return NetworkStateItemViewHolder(view)
+            }
+            else -> {
+                category = true
+                view = layoutInflater.inflate(R.layout.layout_category_list_item, parent, false)
+                return CategoryItemViewHolder(view)
+            }
+
         }
     }
 
@@ -46,8 +57,10 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
 
         if (getItemViewType(position) == RECIPE_VIEW_TYPE) {
             (holder as RecipeItemViewHolder).bind(getItem(position), context)
-        } else {
+        } else if (getItemViewType(position) == NETWORK_VIEW_TYPE) {
             (holder as NetworkStateItemViewHolder).bind(networkState)
+        } else {
+            (holder as CategoryItemViewHolder).bind(getItem(position), context)
         }
     }
 
@@ -57,17 +70,18 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
     }
 
     override fun getItemCount(): Int {
-        return super.getItemCount() + if (hasExtraRow()) 1 else 0
+        return super.getItemCount() // + if (hasExtraRow()) 1 else 0
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (hasExtraRow() && position == itemCount - 1) {
+        return if (getItem(position)?.social_rank == -1.toDouble()) {
+            CATEGORY_VIEW_TYPE
+        } else if (hasExtraRow() && position == itemCount - 1) {
             NETWORK_VIEW_TYPE
         } else {
             RECIPE_VIEW_TYPE
         }
     }
-
 
     class RecipeDiffCallBack : DiffUtil.ItemCallback<Recipe>() {
         override fun areItemsTheSame(oldItem: Recipe, newItem: Recipe): Boolean {
@@ -77,11 +91,9 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
         override fun areContentsTheSame(oldItem: Recipe, newItem: Recipe): Boolean {
             return oldItem == newItem
         }
-
     }
 
     class RecipeItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
         private var row: Recipe? = null
 
         fun bind(recipe: Recipe?, context: Context) {
@@ -94,7 +106,6 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
                 .load(recipe?.image_url)
                 .into(itemView.recipe_image)
 
-
             itemView.recipe_image.setOnClickListener({
 
                 val context = itemView.context
@@ -104,7 +115,6 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
                 context.startActivity(showIntent)
                 Log.d("recipeItemViewHolder", "CLICK!")
             })
-
         }
 
         companion object {
@@ -133,6 +143,39 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
         }
     }
 
+    class CategoryItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private var row: Recipe? = null
+
+        fun bind(recipe: Recipe?, context: Context) {
+            this.row = recipe
+
+            var icon = context.getResources()
+                .getIdentifier(row?.image_url, "drawable", context.getPackageName())
+
+            Glide.with(itemView.context)
+                .asBitmap()
+                .load(icon)
+                .placeholder(R.drawable.ic_launcher_background)
+                .into(itemView.category_image)
+
+            itemView.category_title.text = row?.title
+
+            itemView.category_linear.setOnClickListener({
+
+                val context = itemView.context
+                val showIntent = Intent(context, RecipeListActivity::class.java)
+
+                showIntent.putExtra(CATEGORY_KEY, row?.title)
+                context.startActivity(showIntent)
+                Log.d("CategoryItemViewHolder", "CLICK!")
+            })
+        }
+
+        companion object {
+            private val CATEGORY_KEY = "CATEGORY_ID"
+        }
+    }
+
 
     fun setNetworkState(newNetworkState: NetworkState) {
         val previousState = this.networkState
@@ -158,17 +201,7 @@ class RecipeSearchPagedListAdapter(private val context: Context) :
         notifyItemRangeRemoved(0, size)
     }
 
-//    var parent = findViewById(android.R.id.content) as ViewGroup
-    fun setErrorNetworkState(networkState: NetworkState?, parent: ViewGroup){
-        if(networkState == NetworkState.ERROR){
-
-            layoutInflater = LayoutInflater.from(parent.context)
-            view = layoutInflater.inflate(R.layout.network_state_item, null)
-            view.dotted_progress.visibility = View.VISIBLE
-            var obj  = NetworkStateItemViewHolder(view)
-            setNetworkState(networkState)
-            obj.bind(networkState)
-        }
+    fun categoryVisible(): Boolean {
+        return category
     }
-
 }

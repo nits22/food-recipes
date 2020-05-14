@@ -36,7 +36,7 @@
         android:textStyle="bold"
         android:visibility="gone"/>
 
-    <com.example.foodrecipes.HorizontalDottedProgress
+    <com.example.foodrecipes.util.HorizontalDottedProgress
         android:id="@+id/custom_progress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

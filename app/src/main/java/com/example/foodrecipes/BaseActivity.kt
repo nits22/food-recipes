@@ -1,13 +1,11 @@
 package com.example.foodrecipes
 
-import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import android.view.View
-import com.example.foodrecipes.Repository.NetworkState
-import kotlinx.android.synthetic.*
+import com.example.foodrecipes.util.HorizontalDottedProgress
 import kotlinx.android.synthetic.main.activity_base.*
 
 abstract class BaseActivity : AppCompatActivity() {

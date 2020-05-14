@@ -53,11 +53,11 @@ class RecipeSearchDataSource(
 
         try {
             compositeDisposable.add(
-                getRecipeApi.searchRecipe("Chicken", params.key.toString())
+                getRecipeApi.searchRecipe(query, params.key.toString())
                     .subscribeOn(Schedulers.io())
                     .subscribe(
                         {
-                            if (it.count == POST_PER_PAGE)
+                            if (it.recipes.size == POST_PER_PAGE)
                                 callback.onResult(it.recipes, params.key + 1)
                             networkState.postValue(NetworkState.LOADED)
                         },
